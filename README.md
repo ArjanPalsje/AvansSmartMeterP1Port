@@ -1,5 +1,5 @@
 # AvansSmartMeterP1Port
-With this repository you will be able to create your own P1 Port readout device.
+With this repository you will be able to create your own P1 Port readout device. [Click here for instructions](https://github.com/ArjanPalsje/AvansSmartMeterP1Port/wiki)
 
 It also supports Over-The-Air Firmware updates! Every time it boots up and is connected to the last known Wi-Fi network it will check if a newer firmware is available, if so it will install it automatically. 
 

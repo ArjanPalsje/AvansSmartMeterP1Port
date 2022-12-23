@@ -6,7 +6,7 @@ It also supports Over-The-Air Firmware updates! Every time it boots up and is co
 To change Wi-Fi settings on the ESP-32 you should use the Serial Monitor (Make sure the Serial Monitor is set to NEWLINE only!).
 To see the available commands type '?' in the Serial Monitor, or see the list below :)
 
--Set new Wi-Fi use "WIFI_SETUP:<SSID here>,<PASSWORD here>"
+-Set new Wi-Fi use "WIFI_SETUP:[SSID here],[PASSWORD here]"
 
 -Get the current IP address of the device use "GET_IP"
 

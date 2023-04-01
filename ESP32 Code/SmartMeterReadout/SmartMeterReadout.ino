@@ -93,12 +93,15 @@ void setup() {
 
 //After uploading the sketch to the ESP32 the value will be 4294967
 //So this if-statement checks if that is the case, and if so it puts it to 10 seconds
-  sdLogInterval = EEPROM.readULong(800);
+  
   if (sdLogInterval == 4294967) {
+    //Put 10 seconds in the EEPROM
     EEPROM.writeULong(800, 10000);
     EEPROM.commit();
-    sdLogInterval = 10000;
+    
+    
   }
+  sdLogInterval = EEPROM.readULong(800);
 
 #endif
 

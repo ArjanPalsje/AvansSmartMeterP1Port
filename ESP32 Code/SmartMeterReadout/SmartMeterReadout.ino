@@ -8,7 +8,7 @@
 #include <U8g2lib.h>
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 
-String CURRENT_FIRMWARE_VERSION = "12.87";
+String CURRENT_FIRMWARE_VERSION = "12.90";
 
 #define P1_RX_PIN 16
 uint32_t BAUDRATE = 9600;
@@ -73,22 +73,32 @@ void setup() {
 
 #ifdef OTA
   // Start WiFi connection
-  
+
   WiFi.mode(WIFI_MODE_STA);
-  
+
   int address = 0;
   ssid = EEPROM.readString(address);
   address += ssid.length() + 1;
   password = EEPROM.readString(address);
-  
-  Serial.print("Connecting to SSID: \"");
-      Serial.print(ssid);Serial.println("\"");
-      Serial.print("Password: \"");
-      Serial.print(password);Serial.println("\"");
 
-    
-  WiFi.begin(ssid.c_str(),password.c_str());
-sdLogInterval = EEPROM.readULong(800);
+  Serial.print("Connecting to SSID: \"");
+  Serial.print(ssid);
+  Serial.println("\"");
+  Serial.print("Password: \"");
+  Serial.print(password);
+  Serial.println("\"");
+
+
+  WiFi.begin(ssid.c_str(), password.c_str());
+
+//After uploading the sketch to the ESP32 the value will be 4294967
+//So this if-statement checks if that is the case, and if so it puts it to 10 seconds
+  sdLogInterval = EEPROM.readULong(800);
+  if (sdLogInterval == 4294967) {
+    EEPROM.writeULong(800, 10000);
+    EEPROM.commit();
+    sdLogInterval = 10000;
+  }
 
 #endif
 
@@ -147,7 +157,7 @@ sdLogInterval = EEPROM.readULong(800);
   server.on("/downloadLogFile", downloadLogFile);
   server.on("/downloadLogFileBackup", downloadLogFileBackup);
   server.on("/deleteLogFile", deleteLogFile);
- server.on("/firmwareUpdate", webUpdate);
+  server.on("/firmwareUpdate", webUpdate);
 
   //Start the server
   server.begin();
@@ -168,7 +178,7 @@ void loop() {
 
   //Log data to SD card every 'sdLogInterval' ms
   static unsigned long pMillis = 0;
-  
+
   if (millis() - pMillis >= sdLogInterval && millis() - lastTimeCharsDecoded < 12000 && millis() > sdLogInterval) {
     pMillis = millis();
     if (!SD_ERROR) {
@@ -193,21 +203,16 @@ void loop() {
       Serial.println("Set log interval use \"SET_LOG_INTERVAL\"");
 
 
-    } else if (input.startsWith("GET_IP")) 
-    {
+    } else if (input.startsWith("GET_IP")) {
       Serial.println(WiFi.localIP().toString());
-    } 
-    else if (input.startsWith("PRINT_FILE")) 
-    {
+    } else if (input.startsWith("PRINT_FILE")) {
       File file2 = SD.open("/P1DataLog.csv", FILE_READ);
       while (file2.available()) {
         Serial.write(file2.read());
       }
       file2.close();
       Serial.println("done");
-    }
-     else if (input.startsWith("PRINT_BACKUP_FILE")) 
-    {
+    } else if (input.startsWith("PRINT_BACKUP_FILE")) {
       File file2 = SD.open("/P1DataLog_Backup.csv", FILE_READ);
       while (file2.available()) {
         Serial.write(file2.read());
@@ -218,12 +223,14 @@ void loop() {
 
     else if (input.startsWith("WIFI_SETUP:")) {
       ssid = input.substring(input.indexOf(":") + 1, input.indexOf(","));
-      password = input.substring(input.indexOf(",") + 1,input.indexOf('\n'));
+      password = input.substring(input.indexOf(",") + 1, input.indexOf('\n'));
 
       Serial.print("New SSID: \"");
-      Serial.print(ssid);Serial.println("\"");
+      Serial.print(ssid);
+      Serial.println("\"");
       Serial.print("New Password: \"");
-      Serial.print(password);Serial.println("\"");
+      Serial.print(password);
+      Serial.println("\"");
 
 
       int address = 0;
@@ -232,48 +239,40 @@ void loop() {
       EEPROM.writeString(address, password);
 
       EEPROM.commit();
-      
+
       WiFi.disconnect();
-      
+
       WiFi.begin(ssid.c_str(), password.c_str());
-        }
-    else if (input.startsWith("CHECK_FIRMWARE_VERSION")) 
-    {
-       Serial.println("Current Firmware Version: " + CURRENT_FIRMWARE_VERSION);
-       Serial.println("Please Wait...\n");
-      if(checkForNewFirmware())
-      {
-       Serial.println("New Firmware Available!");
-       Serial.println("Type \"INSTALL_LATEST_VERSION\" to install latest version");
+    } else if (input.startsWith("CHECK_FIRMWARE_VERSION")) {
+      Serial.println("Current Firmware Version: " + CURRENT_FIRMWARE_VERSION);
+      Serial.println("Please Wait...\n");
+      if (checkForNewFirmware()) {
+        Serial.println("New Firmware Available!");
+        Serial.println("Type \"INSTALL_LATEST_VERSION\" to install latest version");
       }
 
-      else
-      {
+      else {
         Serial.println("No new Firmware found");
       }
-    }
-    else if (input.startsWith("INSTALL_LATEST_VERSION")) 
-    {
+    } else if (input.startsWith("INSTALL_LATEST_VERSION")) {
       checkAndInstallUpdate();
-    }
-    else if (input.startsWith("SET_LOG_INTERVAL")) 
-    {
-      Serial.print("Current log interval(s): ");Serial.println(sdLogInterval/1000);
+    } else if (input.startsWith("SET_LOG_INTERVAL")) {
+      Serial.print("Current log interval(s): ");
+      Serial.println(sdLogInterval / 1000);
       Serial.print("Enter new interval in seconds:");
-      while(Serial.available()){Serial.read();
+      while (Serial.available()) {
+        Serial.read();
       }
       unsigned long sm = millis();
-      while(!Serial.available() && millis() - sm < 20000){}
-       float intervalT = Serial.parseFloat()*1000;
-      Serial.println(intervalT/1000,0);
+      while (!Serial.available() && millis() - sm < 20000) {}
+      float intervalT = Serial.parseFloat() * 1000;
+      Serial.println(intervalT / 1000, 0);
       EEPROM.writeULong(800, intervalT);
       EEPROM.commit();
-      while(Serial.available()){Serial.read();}
+      while (Serial.available()) { Serial.read(); }
       Serial.println("done");
-    }
-    else
-    {
-Serial.println("Command not recognized");
+    } else {
+      Serial.println("Command not recognized");
     }
   }
 }

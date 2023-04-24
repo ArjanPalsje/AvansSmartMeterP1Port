@@ -108,6 +108,14 @@ void parseData() {
         lastTimeCharsDecoded = millis();
       }
 
+      else if (sscanf(inputBuffer, "0-n:24.2.1.255(%ld.%ld%d*s", &tl, &tld) > 0) {
+        gasMeter = tl + tld * 0.1;
+#ifdef PRINT_HUMAN_READABLE_SENTENCES
+        Serial.print("Gas delivery(m3): ");
+        Serial.println(gasMeter);
+#endif
+        lastTimeCharsDecoded = millis();
+      }
 
 
       //Clear input buffer

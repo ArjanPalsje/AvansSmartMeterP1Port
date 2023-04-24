@@ -1,4 +1,3 @@
-
 void HomePage()
 {
   String ptr = "<!DOCTYPE html> <html>\n";
@@ -31,7 +30,7 @@ void deleteLogFile()
   File DELETE = SD.open("/P1DataLog.csv");
     if (DELETE) 
     {
-      DELETE.close();
+  DELETE.close();
   deleteFile(SD, "/P1DataLog.csv");
   String ptr = "<!DOCTYPE html> <html>\n";
   ptr +="<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\">\n";

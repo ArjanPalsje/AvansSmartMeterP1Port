@@ -44,6 +44,7 @@ int currentLength = 0;  //current size of written firmware
 
 
 char inputBuffer[100];
+
 uint8_t currentBufferPosition = 0;
 double consumptionLowRate = 0;
 double consumptionHighRate = 0;
@@ -52,6 +53,8 @@ double redeliveryLowRate = 0;
 double currentRedeliveryPower = 0;
 double voltage;
 double currentPower = 0;
+double gasMeter = 0;
+
 int YEAR, MONTH, DAY, HOUR, MINUTE, SECOND;
 
 unsigned long lastTimeCharsReceived;
@@ -97,9 +100,7 @@ void setup() {
   if (sdLogInterval == 4294967) {
     //Put 10 seconds in the EEPROM
     EEPROM.writeULong(800, 10000);
-    EEPROM.commit();
-    
-    
+    EEPROM.commit(); 
   }
   sdLogInterval = EEPROM.readULong(800);
 

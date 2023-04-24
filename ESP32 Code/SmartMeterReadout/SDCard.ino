@@ -12,11 +12,11 @@ void initSDCard() {
 
     if (!SD.exists("/P1DataLog.csv")) {
       Serial.println("Not on SD Card");
-      appendFile(SD, "/P1DataLog.csv", "yyyy-mm-dd hh-mm-ss,consumptionLowRate(Wh),consumptionHighRate(Wh),redeliveryLowRate(Wh),redeliveryHighRate(Wh),currentRedeliveryPower(W),Voltage(V),Power(W)\r\n");
+      appendFile(SD, "/P1DataLog.csv", "yyyy-mm-dd hh-mm-ss,consumptionLowRate(Wh),consumptionHighRate(Wh),redeliveryLowRate(Wh),redeliveryHighRate(Wh),currentRedeliveryPower(W),Voltage(V),Power(W),gasDelivery(m3)\r\n");
     }
     if (!SD.exists("/P1DataLog_Backup.csv")) {
       Serial.println("Not on SD Card");
-      appendFile(SD, "/P1DataLog_Backup.csv", "yyyy-mm-dd hh-mm-ss,consumptionLowRate(Wh),consumptionHighRate(Wh),redeliveryLowRate(Wh),redeliveryHighRate(Wh),currentRedeliveryPower(W),Voltage(V),Power(W)\r\n");
+      appendFile(SD, "/P1DataLog_Backup.csv", "yyyy-mm-dd hh-mm-ss,consumptionLowRate(Wh),consumptionHighRate(Wh),redeliveryLowRate(Wh),redeliveryHighRate(Wh),currentRedeliveryPower(W),Voltage(V),Power(W),gasDelivery(m3)\r\n");
     }
   }
 
@@ -41,7 +41,7 @@ void logSDCard() {
   String dateString = String(YEAR) + "-" + String(MONTH) + "-" + String(DAY) + " " + String(HOUR) + ":" + String(MINUTE) + ":" + String(SECOND);
 
 
-  String dataMessage = dateString + "," + String(consumptionLowRate, 0) + "," + String(consumptionHighRate, 0) + "," + String(redeliveryLowRate, 0) + "," + String(redeliveryHighRate, 0) + "," + String(currentRedeliveryPower, 0) + "," + String(voltage, 0) + "," + String(currentPower, 0) + "\r\n";
+  String dataMessage = dateString + "," + String(consumptionLowRate, 0) + "," + String(consumptionHighRate, 0) + "," + String(redeliveryLowRate, 0) + "," + String(redeliveryHighRate, 0) + "," + String(currentRedeliveryPower, 0) + "," + String(voltage, 0) + "," + String(currentPower, 0) + "," + String(gasMeter, 3) + "\r\n";
   Serial.print("Save data: ");
   Serial.println(dataMessage);
   delay(250);
